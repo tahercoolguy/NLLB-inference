@@ -29,7 +29,11 @@ translate () {
             --decoder-langtok --encoder-langtok src \
             --langs $(cat $root/langs.txt) \
             --lang-pairs $slang-$tlang \
-            --add-data-source-prefix-tags 2>&1
+            --add-data-source-prefix-tags 2>&1 | \
+        grep -P "H-[0-9]+" | cut -f3- | \
+        spm_decode  --model $root/preprocess/flores200_sacrebleu_tokenizer_spm.model --input_format=piece | \
+        sed 's/^<MINED_DATA> //g' | \
+        cat
 }
 
 translate $ckp $slang $tlang < /dev/stdin
